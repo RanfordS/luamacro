@@ -1,0 +1,15 @@
+#/:: Macro test
+#local res = ""
+#for i=1,3 do
+#   res = res..source:gsub ("N", tostring (i))
+#end
+#return res
+#::/# Test N
+
+print (N)
+
+#::#
+
+#:{
+Deleted
+#:}

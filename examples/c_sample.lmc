@@ -1,0 +1,30 @@
+#include <stdio.h>
+
+/*:: Macro test
+local res = ""
+for i = 2, 3 do
+  res = res..source:gsub ("N", tostring (i))
+end
+return res
+::*/
+// N component vector
+//:{
+#define N 2
+//:}
+typedef struct
+{   float v[N];
+} vectorN;
+
+vectorN vecN_add (vectorN a, vectorN b)
+{
+    vectorN new;
+    for (int i = 0; i < N; ++i)
+        new.v[i] = a.v[i] + b.v[i];
+    return new;
+}
+
+
+
+//:: End of macro
+
+//EOF

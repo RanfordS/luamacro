@@ -7,4 +7,5 @@ return
     ,   sups = "//:}"
     }
 ,   lead = false
+,   comm = "//"
 }

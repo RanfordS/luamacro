@@ -5,8 +5,11 @@ local in_name = assert (arg[1], "No input file")
 local out_name = assert (arg[2], "No output file")
 
 -- determine language
---TODO
-local Lang = require "lang/c"
+local ext = out_name:reverse ()
+                    :match ("^(.-)%.")
+                    :reverse ()
+local Lang = assert (require ("lang/".. ext)
+, "Language definition not found for .".. ext)
 
 -- get files
 local input = assert (io.open (in_name, "r")
@@ -61,6 +64,9 @@ function stack.peek (i)
 end
 local switch =
 {   open = function (token)
+        if #stack > 0 and stack.peek (0) == "open" then
+            io.write ("\27[4mWarning:\27[0m macro inside macro script!\n")
+        end
         table.insert (stack, token)
     end
 ,   midd = function (token)
@@ -117,8 +123,90 @@ end
 
 
 
+-- do blocks
+for _, block in ipairs (blocks) do
+    -- crop script
+    local script = "return function (source)\n"
+    if block.open.row == block.shut.row then
+        -- single line special case
+        local line = source[block.open.row]
+        line = line:sub (block.open.aft+1, block.midd.col-1)
+        script = script .. line .."\n"
+    else
+        -- general case
+        local label = source[block.open.row]
+        label = label:sub (block.open.aft+1, -1)
+        label = label:gsub ("^%s*", "")
+        if label ~= "" then
+            io.write ("Doing macro block: ".. label)
+        end
+        -- extract
+        for i = block.open.row+1, block.midd.row-1 do
+            local line = source[i]
+            if Lang.lead then
+                line = line:gsub (Lang.lead, "")
+            end
+            script = script .. line
+        end
+        local midd = source[block.midd.row]
+        midd = midd:sub (0, block.midd.col-1)
+        script = script .. midd .."\n"
+    end
+    script = script .."end"
+
+    -- crop code
+    local code = ""
+    if block.midd.row == block.shut.row then
+        -- single line special case
+        code = source[block.midd.row]
+        code = code:sub (block.midd.aft+1, block.shut.col-1)
+        code = code ..'\n'
+    else
+        -- general case
+        code = source[block.midd.row]
+        code = code:sub (block.midd.aft+1, -1)
+        -- tidy
+        if code == "\n" then code = "" end
+        -- extract
+        for i = block.midd.row+1, block.shut.row-1 do
+            code = code .. source[i]
+        end
+        local shut = source[block.shut.row]
+        shut = shut:sub (0, block.shut.col-1)
+        code = code .. shut
+    end
+
+    -- do script
+    local result = load (script)()(code)
+
+    -- source code before and after the block
+    local pre = source[block.open.row]:sub (0, block.open.col-1)
+    local pro = source[block.shut.row]:sub (block.shut.aft+1, -1)
+    -- trailing comment
+    if pro == "\n" then
+        pro = ""
+    else
+        pro = Lang.comm .. pro
+    end
+    -- write result to source
+    source[block.open.row] = pre .. result .. pro
+    for i = block.open.row+1, block.shut.row do
+        source[i] = ""
+    end
+
+    -- macro block done
+end
 
 
 
+-- write result to file
+for _, text in ipairs (source) do
+    output:write (text)
+end
+
+
+
+-- Written by: Alexander J. Johnson
+-- https://github.com/RanfordS
 
 -- EOF
