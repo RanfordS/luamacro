@@ -8,6 +8,7 @@ Easily expandable for other languages.
 Macro blocks consist of two paired regions:
 1. script, which provides the lua code that performs the macro;
 1. source, which provides a section of the host language to the script.
+
 Example:
 ```c
 /*::<macro name (optional)>
