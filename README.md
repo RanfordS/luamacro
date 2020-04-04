@@ -34,6 +34,7 @@ int arr[N];
 ```
 
 Command: `lua luamacro.lua <source file> <dest file>`
+
 The script determines the language based on the extension of `<dest file>`.
 
 ## Add a Language
