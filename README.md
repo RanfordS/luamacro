@@ -8,6 +8,7 @@ Easily expandable for other languages.
 Macro blocks consist of two paired regions:
 1. script, which provides the lua code that performs the macro;
 1. source, which provides a section of the host language to the script.
+
 Example:
 ```c
 /*::<macro name (optional)>
@@ -34,6 +35,7 @@ int arr[N];
 ```
 
 Command: `lua luamacro.lua <source file> <dest file>`
+
 The script determines the language based on the extension of `<dest file>`.
 
 ## Add a Language
