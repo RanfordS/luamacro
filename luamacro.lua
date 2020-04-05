@@ -8,7 +8,7 @@ local out_name = assert (arg[2], "No output file")
 local ext = out_name:reverse ()
                     :match ("^(.-)%.")
                     :reverse ()
-local Lang = assert (require ("lang/".. ext)
+local Lang = assert (require ("lm_lang/".. ext)
 , "Language definition not found for .".. ext)
 
 -- get files
@@ -206,6 +206,7 @@ end
 
 
 
+-- Date 2020/04/05
 -- Written by: Alexander J. Johnson
 -- https://github.com/RanfordS
 
